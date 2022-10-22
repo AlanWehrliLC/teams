@@ -32,6 +32,7 @@ export function Groups() {
         ListEmptyComponent={()=> (
           <ListEmpty message="How about registering the first class?" />
         )}
+        showsVerticalScrollIndicator={false}
       />
 
       <Button title='Create new class' />
