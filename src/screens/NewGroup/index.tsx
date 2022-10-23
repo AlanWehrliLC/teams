@@ -7,6 +7,8 @@ import { Header } from "@components/Header";
 import { Button } from "@components/Button";
 import { Input } from "@components/Input";
 import { groupCreate } from "@storage/group/groupCreate";
+import { AppError } from "@utils/AppError";
+import { Alert } from "react-native";
 
 
 export function NewGroup(){
@@ -16,10 +18,19 @@ export function NewGroup(){
 
     async function handleNew(){
         try {
+            if (group.trim().length === 0) {
+                return Alert.alert("New Group", "Enter the class name!")
+            }
+
             await groupCreate(group)
             navigation.navigate("players", {group})
         } catch (error) {
-            console.log(error)
+            if (error instanceof AppError) {
+                Alert.alert("New Group", error.message)
+            }else{
+                Alert.alert("New Group", "Could not create a new group!")
+                console.log(error)
+            }
         }
     }
 
