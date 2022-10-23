@@ -18,12 +18,14 @@ type RouteParams = {
 }
 
 export function Players(){
+    const route = useRoute()
+    const {group} = route.params as RouteParams
+
+    
     const [team, setTeam] = useState("")
     const [teams, setTeams] = useState<string[]>([])
     const [players, setPlayers] = useState<string[]>([])
 
-    const route = useRoute()
-    const {group} = route.params as RouteParams
 
     return (
         <Container>
