@@ -18,12 +18,15 @@ import { playersGetByGroupAndTeam } from "@storage/player/playersGetByGroupAndTe
 import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
 import { playerRemoveByGroup } from "@storage/player/playerRemoveByGroup";
 import { groupRemoveByName } from "@storage/group/groupRemoveByName";
+import { Loading } from "@components/Loading";
 
 type RouteParams = {
     group: string
 }
 
 export function Players(){
+    const [isLoading, setIsLoading] = useState(true)
+
     const route = useRoute()
     const navigation = useNavigation()
     const {group} = route.params as RouteParams
@@ -63,10 +66,14 @@ export function Players(){
 
     async function fetchPlayersByTeam(){
         try {
+            setIsLoading(true)
+
             const playersByTeam = await playersGetByGroupAndTeam(group, team)
             setPlayers(playersByTeam)
         } catch (error) {
             Alert.alert("People", "Unable to load the people of the selected team!")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -90,8 +97,8 @@ export function Players(){
 
     async function handleGroupRemove(){
         Alert.alert(
-            "To remove",
-            "Do you want to remove the group?",
+            "Remove",
+            "Do you want to remove the class?",
             [
                 {text: "No", style: "cancel"},
                 {text: "Sim", onPress: ()=> groupRemove()}
@@ -148,24 +155,27 @@ export function Players(){
                 </NumberOfPlayers>
             </HeaderList>
 
-            <FlatList 
-                data={players}
-                keyExtractor={item => item.name}
-                renderItem={({item})=>(
-                    <PlayerCard
-                        name={item.name}
-                        onRemove={()=> handlePlayerRemove(item.name)}
+            {
+                isLoading ? <Loading /> :
+                    <FlatList 
+                        data={players}
+                        keyExtractor={item => item.name}
+                        renderItem={({item})=>(
+                            <PlayerCard
+                                name={item.name}
+                                onRemove={()=> handlePlayerRemove(item.name)}
+                            />
+                        )}
+                        ListEmptyComponent={()=>(
+                            <ListEmpty message="How about registering the first person?" />
+                        )}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={[
+                            {paddingBottom: 100},
+                            players.length === 0 && {flex: 1}
+                        ]}
                     />
-                )}
-                ListEmptyComponent={()=>(
-                    <ListEmpty message="How about registering the first person?" />
-                )}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={[
-                    {paddingBottom: 100},
-                    players.length === 0 && {flex: 1}
-                ]}
-            />
+            }
 
             <Button
                 title="Remove class"
